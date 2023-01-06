@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import './App.css'
+import { JwtTokenType } from './JwtTokenType'
 
-interface JwtTokenType {
-  picture: string
-}
-
-function App() {
-  const [token, setToken] = useState<JwtTokenType | null>(null)
+function App({ token, setToken }: { token: string; setToken: any }) {
+  const [tokenObj, setTokenObj] = useState<JwtTokenType | null>(null)
 
   const [typed, setTyped] = useState<string>('')
   const [typedList, setTypedList] = useState<string[]>([])
@@ -18,7 +14,7 @@ function App() {
     typedList[index] = e.target.value
     setTypedList([...typedList])
   }
-  const handleButtonClick = () => {
+  const handleAddButtonClick = () => {
     if (typed !== '') {
       setTypedList([...typedList, typed])
       console.log(typedList)
@@ -26,22 +22,14 @@ function App() {
     }
   }
 
-  const navigate = useNavigate()
-
   const handleSignOut = () => {
     localStorage.removeItem('jwtToken')
-    setToken(null)
-    navigate('/login')
+    setTokenObj(null)
+    setToken('')
   }
 
   useEffect(() => {
-    if (localStorage.getItem('jwtToken') != null) {
-      const decode: string | null = localStorage.getItem('jwtToken')
-      if (decode != null) {
-        setToken(JSON.parse(decode))
-        console.log(token)
-      }
-    }
+    setTokenObj(JSON.parse(token))
   }, [])
 
   return (
@@ -71,7 +59,9 @@ function App() {
           <div className='dropdown dropdown-end'>
             <label tabIndex={0} className='btn btn-ghost btn-circle avatar'>
               <div className='w-10 rounded-full'>
-                <img src={token != null ? token.picture : 'profile-image'} />
+                <img
+                  src={tokenObj != null ? tokenObj.picture : 'profile-image'}
+                />
               </div>
             </label>
             <ul
@@ -94,7 +84,7 @@ function App() {
             value={typed}
             onChange={(e) => setTyped(e.target.value)}
           ></textarea>
-          <button className='btn glass btn-sm' onClick={handleButtonClick}>
+          <button className='btn glass btn-sm' onClick={handleAddButtonClick}>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               width='30'
